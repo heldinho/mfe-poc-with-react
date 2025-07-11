@@ -1,32 +1,44 @@
-import React, { lazy, Suspense } from "react"; // Must be imported for webpack to work
-import "./App.css";
+import React, { lazy, Suspense, memo } from 'react';
+import './App.css';
 
+// Fallbacks como componentes memoizados
+const HeaderFallback = memo(() => <div>Loading Header...</div>);
+const ModalFallback = memo(() => <div>Loading Modal...</div>);
+const ErrorFallback = memo(() => <div>Componente indisponível</div>);
+
+// Lazy loading com tratamento de erro otimizado
 const Header = lazy(() =>
-  import("HeaderApp/Header").catch((error) => {
-    console.error("Falha ao carregar componente remoto:", error);
-    return { default: () => <div>Componente indisponível</div> };
-  }),
+  import('HeaderApp/Header').catch(() => ({
+    default: ErrorFallback,
+  })),
 );
 
 const Modal = lazy(() =>
-  import("ModalApp/Modal").catch((error) => {
-    console.error("Falha ao carregar componente remoto:", error);
-    return { default: () => <div>Componente indisponível</div> };
-  }),
+  import('ModalApp/Modal').catch(() => ({
+    default: ErrorFallback,
+  })),
 );
 
-function App() {
-  return (
-    <div className="App">
-      <Suspense fallback={<div>Loading Header...</div>}>
-        <Header />
-      </Suspense>
-      <Suspense fallback={<div>Loading Modal...</div>}>
-        <Modal />
-      </Suspense>
-      <div className="container">Demo home page</div>
-    </div>
-  );
-}
+// Componentes otimizados com memo
+const MemoizedHeader = memo(() => (
+  <Suspense fallback={<HeaderFallback />}>
+    <Header />
+  </Suspense>
+));
+
+const MemoizedModal = memo(() => (
+  <Suspense fallback={<ModalFallback />}>
+    <Modal />
+  </Suspense>
+));
+
+// App principal
+const App = memo(() => (
+  <div className="App">
+    <MemoizedHeader />
+    <MemoizedModal />
+    <div className="container">Demo home page</div>
+  </div>
+));
 
 export default App;
