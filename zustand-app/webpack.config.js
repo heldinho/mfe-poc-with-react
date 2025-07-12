@@ -3,10 +3,11 @@ const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPl
 const { dependencies } = require('./package.json');
 
 module.exports = {
-  entry: './src/entry',
+  entry: './src/entry.js',
   mode: 'development',
   devServer: {
-    port: 9000, // Alterado de 3000 para 9000
+    port: 3003,
+    historyApiFallback: true,
   },
   module: {
     rules: [
@@ -31,14 +32,14 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './public/index.html',
+      favicon: './public/favicon.ico',
     }),
     new ModuleFederationPlugin({
-      name: 'HomeApp',
-      remotes: {
-        // IMPORTANTE: Se o HeaderApp também mudar de porta, você precisará atualizar esta URL
-        HeaderApp: 'HeaderApp@http://localhost:3001/remoteEntry.js',
-        ModalApp: 'ModalApp@http://localhost:3002/remoteEntry.js',
-        ZustandApp: 'ZustandApp@http://localhost:3003/remoteEntry.js',
+      name: 'ZustandApp',
+      filename: 'remoteEntry.js',
+      exposes: {
+        './Zustand': './src/App',
+        './useCounterStore': './src/store/counterStore',
       },
       shared: {
         ...dependencies,
