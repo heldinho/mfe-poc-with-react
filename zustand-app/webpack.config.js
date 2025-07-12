@@ -8,6 +8,9 @@ module.exports = {
   devServer: {
     port: 3003,
     historyApiFallback: true,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
   module: {
     rules: [
@@ -39,22 +42,15 @@ module.exports = {
       filename: 'remoteEntry.js',
       exposes: {
         './Zustand': './src/App',
-        './useCounterStore': './src/store/counterStore',
+        './Counter': './src/Counter',
+        './useCounterStore': './src/store',
+        './store': './src/store',
       },
       shared: {
         ...dependencies,
-        react: {
-          singleton: true,
-          requiredVersion: dependencies['react'],
-        },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: dependencies['react-dom'],
-        },
-        zustand: {
-          singleton: true,
-          requiredVersion: dependencies['zustand'],
-        },
+        react: { singleton: true, requiredVersion: false },
+        'react-dom': { singleton: true, requiredVersion: false },
+        zustand: { singleton: true, requiredVersion: false },
       },
     }),
   ],

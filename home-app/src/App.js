@@ -1,54 +1,57 @@
-import React, { lazy, Suspense, memo, use } from 'react';
 import './App.css';
+import React from 'react';
 
-// Fallbacks como componentes memoizados
-const HeaderFallback = memo(() => <div>Loading Header...</div>);
-const ModalFallback = memo(() => <div>Loading Modal...</div>);
-const ErrorFallback = memo(() => <div>Componente indisponível</div>);
+const HeaderFallback = React.memo(() => <div>Loading Header...</div>);
+const ModalFallback = React.memo(() => <div>Loading Modal...</div>);
+const ErrorFallback = React.memo(() => <div>Componente indisponível</div>);
 
-const zustandApp = React.lazy(() =>
-  import('ZustandApp/useCounterStore').catch(() => ({
-    default: null,
+const Counter = React.lazy(() => import('ZustandApp/Counter'));
+
+const ZustandApp = React.lazy(() =>
+  import('ZustandApp/Zustand').catch(() => ({
+    default: ErrorFallback,
   })),
 );
 
-// Lazy loading com tratamento de erro otimizado
-const Header = lazy(() =>
+const Header = React.lazy(() =>
   import('HeaderApp/Header').catch(() => ({
     default: ErrorFallback,
   })),
 );
 
-const Modal = lazy(() =>
+const Modal = React.lazy(() =>
   import('ModalApp/Modal').catch(() => ({
     default: ErrorFallback,
   })),
 );
 
-// Componentes otimizados com memo
-const MemoizedHeader = memo(() => (
-  <Suspense fallback={<HeaderFallback />}>
+const MemoizedHeader = React.memo(() => (
+  <React.Suspense fallback={<HeaderFallback />}>
     <Header />
-  </Suspense>
+  </React.Suspense>
 ));
 
-const MemoizedModal = memo(() => (
-  <Suspense fallback={<ModalFallback />}>
+const MemoizedModal = React.memo(() => (
+  <React.Suspense fallback={<ModalFallback />}>
     <Modal />
-  </Suspense>
+  </React.Suspense>
 ));
 
-const App = () => {
-  const { count, increment, decrement, reset } = zustandApp();
+export default function App() {
+  const [store, setStore] = React.useState(null);
+
+  React.useEffect(() => {
+    import('ZustandApp/store').then(mod => setStore(() => mod.default));
+  }, []);
 
   return (
     <div className="App">
       <MemoizedHeader />
       <MemoizedModal />
+      <ZustandApp />
       <div className="container">Demo home page</div>
-      <button onClick={increment}>Count: {count}</button>
+      {store && <div>Valor atual do contador: {store.getState().count}...</div>}
+      <Counter />
     </div>
   );
-};
-
-export default App;
+}

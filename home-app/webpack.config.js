@@ -7,6 +7,9 @@ module.exports = {
   mode: 'development',
   devServer: {
     port: 9000, // Alterado de 3000 para 9000
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
   },
   module: {
     rules: [
@@ -42,18 +45,9 @@ module.exports = {
       },
       shared: {
         ...dependencies,
-        react: {
-          singleton: true,
-          requiredVersion: dependencies['react'],
-        },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: dependencies['react-dom'],
-        },
-        zustand: {
-          singleton: true,
-          requiredVersion: dependencies['zustand'],
-        },
+        react: { singleton: true, requiredVersion: false },
+        'react-dom': { singleton: true, requiredVersion: false },
+        zustand: { singleton: true, requiredVersion: false },
       },
     }),
   ],

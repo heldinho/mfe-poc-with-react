@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './App.css';
+import { useRemoteStoreValue } from './hooks/useRemoteStoreValue';
 
-function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export default function App() {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
+  const count = useRemoteStoreValue(
+    () => import('ZustandApp/store'),
+    state => state.count,
+  );
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <div className="modalApp">
-      <div>Modal App</div>
+      <div>Modal App - Contador remoto: {count ?? '...'}</div>
 
-      {/* Botão para abrir o modal */}
       <button onClick={openModal} className="open-modal-btn">
         Abrir Modal
       </button>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -32,10 +31,9 @@ function App() {
               </button>
             </div>
             <div className="modal-body">
-              <p>
-                Este é o conteúdo do modal. Você pode adicionar qualquer
-                conteúdo aqui.
-              </p>
+              <p>Este é o conteúdo do modal.</p>
+              <br />
+              <div>Valor atual do contador: {count}</div>
             </div>
             <div className="modal-footer">
               <button onClick={closeModal} className="cancel-btn">
@@ -57,5 +55,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
