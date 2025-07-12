@@ -1,5 +1,6 @@
 import './App.css';
 import React from 'react';
+import { useRemoteStoreValue } from './hooks/useRemoteStoreValue';
 
 const HeaderFallback = React.memo(() => <div>Loading Header...</div>);
 const ModalFallback = React.memo(() => <div>Loading Modal...</div>);
@@ -40,6 +41,11 @@ const MemoizedModal = React.memo(() => (
 export default function App() {
   const [store, setStore] = React.useState(null);
 
+  const count = useRemoteStoreValue(
+    () => import('ZustandApp/store'),
+    state => state.count,
+  );
+
   React.useEffect(() => {
     import('ZustandApp/store').then(mod => setStore(() => mod.default));
   }, []);
@@ -50,7 +56,7 @@ export default function App() {
       <MemoizedModal />
       <ZustandApp />
       <div className="container">Demo home page</div>
-      {store && <div>Valor atual do contador: {store.getState().count}...</div>}
+      <div>Valor atual do contador: {count}...</div>
       <Counter />
     </div>
   );
